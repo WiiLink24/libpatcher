@@ -103,14 +103,14 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD)
+	@rm -fr $(BUILD) libpatcher.a
 
 #---------------------------------------------------------------------------------
 install: build
 	@echo Installing ...
-	@mkdir -p $(DESTDIR)/include/$(TARGET) $(DESTDIR)/lib
-	@install -v -m 644 build/$(TARGET).a $(DESTDIR)/lib
-	@install -v -m 644 source/$(TARGET).h $(DESTDIR)/include/$(TARGET)
+	@mkdir -p $(DESTDIR)/include/libpatcher $(DESTDIR)/lib
+	@install -v -m 644 build/libpatcher.a $(DESTDIR)/lib
+	@install -v -m 644 source/libpatcher.h $(DESTDIR)/include/libpatcher
 
 #---------------------------------------------------------------------------------
 else
@@ -120,14 +120,14 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(OUTPUT).a: $(OFILES)
+libpatcher.a: $(OFILES)
 
 #---------------------------------------------------------------------------------
 # This rule will create a library with all the object files
 #---------------------------------------------------------------------------------
-%.a:
-	@echo Archiving ... $(notdir $@)
-	@$(AR) $(ARFLAGS) $(notdir $@) $^
+.a:
+	@echo Archiving...
+	@$(AR) $(ARFLAGS) build/libpatcher.a $^
 
 -include $(DEPENDS)
 
