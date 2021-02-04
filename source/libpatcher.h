@@ -1,8 +1,10 @@
+#include <gccore.h>
+
 bool patch_memory_range(u32 *start, u32 *end, const u16 original_patch[],
                         const u16 new_patch[], u32 patch_size);
 
 bool patch_ios_range(const u16 original_patch[], const u16 new_patch[],
-                                             u32 patch_size);
+                     u32 patch_size);
 
 // Applies specific patches.
 bool patch_ahbprot_reset();
