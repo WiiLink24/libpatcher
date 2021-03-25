@@ -13,6 +13,29 @@
 #define IOS_MEMORY_START (u32 *)0x933E0000
 #define IOS_MEMORY_END (u32 *)0x93FFFFFF
 
+uint8_t in_dolphin = 0xFF;
+
+// Within Dolphin, we have no IOS to patch.
+// Additionally, many patches can cause Dolphin to fail.
+bool is_dolphin() {
+    // We may have detected this before.
+    if (in_dolphin != 0xFF) {
+        return (in_dolphin == 1);
+    }
+
+    s32 fd = IOS_Open("/dev/dolphin", IPC_OPEN_READ);
+
+    // On a real Wii, this returns a negative number as an error.
+    // Within Dolphin, we acquire a file descriptor starting at 0 or above.
+    // We should close the handle if this is the case.
+    if (fd >= 0) {
+        IOS_Close(fd);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void disable_memory_protections() { write16(MEM2_PROT, 2); }
 
 bool patch_memory_range(u32 *start, u32 *end, const u16 original_patch[],
@@ -38,6 +61,9 @@ bool patch_memory_range(u32 *start, u32 *end, const u16 original_patch[],
 
 bool patch_ios_range(const u16 original_patch[], const u16 new_patch[],
                      u32 patch_size) {
+    // Consider our changes successful under Dolphin.
+    if (is_dolphin())
+        return true;
     return patch_memory_range(IOS_MEMORY_START, IOS_MEMORY_END, original_patch,
                               new_patch, patch_size);
 }
@@ -59,6 +85,10 @@ bool reload_current_ios() {
 }
 
 bool patch_ahbprot_reset() {
+    // Under Dolphin, we do not need to disable AHBPROT.
+    if (is_dolphin())
+        return true;
+
     // Check if we've already disabled AHBPROT.
     // AHBPROT may already be disabled, depending on the user's IOS.
     if (!(AHBPROT_ENABLED)) {

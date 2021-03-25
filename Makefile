@@ -8,6 +8,7 @@ $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>dev
 endif
 
 include $(DEVKITPPC)/wii_rules
+PORTLIBS_WII	:= $(DEVKITPRO)/portlibs/wii
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
@@ -108,9 +109,9 @@ clean:
 #---------------------------------------------------------------------------------
 install: build
 	@echo Installing ...
-	@mkdir -p $(DESTDIR)/include/libpatcher $(DESTDIR)/lib
-	@install -v -m 644 build/libpatcher.a $(DESTDIR)/lib
-	@install -v -m 644 source/libpatcher.h $(DESTDIR)/include/libpatcher
+	@mkdir -p $(DESTDIR)$(PORTLIBS_WII)/include/libpatcher $(DESTDIR)$(PORTLIBS_WII)/lib
+	@install -v -m 644 build/libpatcher.a $(DESTDIR)$(PORTLIBS_WII)/lib
+	@install -v -m 644 source/libpatcher.h $(DESTDIR)$(PORTLIBS_WII)/include/libpatcher
 
 #---------------------------------------------------------------------------------
 else

@@ -27,6 +27,4 @@ int main(void) {
 It's recommended to not initialize WPAD and similar IOS-backed functions until after patching,
 as IOS upon reload will not be set up to relay input over Bluetooth.
 
-Alternatively, one can shutdown, patch, and later initialize WPAD and similar libraries.
-
-ES will be automatically initialized by libogc upon IOS reload.
+Alternatively, one can shutdown, patch, and later initialize WPAD and similar libraries. ES will be automatically initialized by libogc upon IOS reload.
