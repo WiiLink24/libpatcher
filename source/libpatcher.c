@@ -30,8 +30,10 @@ bool is_dolphin() {
     // We should close the handle if this is the case.
     if (fd >= 0) {
         IOS_Close(fd);
+        in_dolphin = 1;
         return true;
     } else {
+        in_dolphin = 0;
         return false;
     }
 }
