@@ -9,7 +9,7 @@
 #define HW_AHBPROT 0x0d800064
 #define MEM2_PROT 0x0d8b420a
 
-#define AHBPROT_ENABLED read32(HW_AHBPROT) == 0xFFFFFFFF
+#define AHBPROT_DISABLED read32(HW_AHBPROT) == 0xFFFFFFFF
 #define IOS_MEMORY_START (u32 *)0x933E0000
 #define IOS_MEMORY_END (u32 *)0x93FFFFFF
 
@@ -64,42 +64,24 @@ bool patch_memory_range(u32 *start, u32 *end, const u16 original_patch[],
 bool patch_ios_range(const u16 original_patch[], const u16 new_patch[],
                      u32 patch_size) {
     // Consider our changes successful under Dolphin.
-    if (is_dolphin())
+    if (is_dolphin()) {
         return true;
+    }
+
     return patch_memory_range(IOS_MEMORY_START, IOS_MEMORY_END, original_patch,
                               new_patch, patch_size);
 }
 
-bool reload_current_ios() {
-    s32 current_ios = IOS_GetVersion();
-    if (current_ios < 0) {
-        printf("unable to get current IOS version! (error %d)\n", current_ios);
-        return false;
-    }
-
-    s32 ios_result = IOS_ReloadIOS(current_ios);
-    if (ios_result < 0) {
-        printf("unable to reload IOS version! (error %d)\n", ios_result);
-        return false;
-    }
-
-    return true;
-}
-
-bool patch_ahbprot_reset() {
+bool patch_ahbprot_reset_for_ver(s32 ios_version) {
     // Under Dolphin, we do not need to disable AHBPROT.
-    if (is_dolphin())
-        return true;
-
-    // Check if we've already disabled AHBPROT.
-    // AHBPROT may already be disabled, depending on the user's IOS.
-    if (!(AHBPROT_ENABLED)) {
+    if (is_dolphin()) {
         return true;
     }
 
     // We'll need to disable MEM2 protections in order to write over IOS.
     disable_memory_protections();
 
+    // Attempt to patch IOS.
     bool patched = patch_ios_range(ticket_check_old, ticket_check_patch,
                                    TICKET_CHECK_SIZE);
     if (!patched) {
@@ -107,15 +89,31 @@ bool patch_ahbprot_reset() {
         return false;
     }
 
-    if (!reload_current_ios()) {
-        printf("failed to reload IOS!\n");
+    s32 ios_result = IOS_ReloadIOS(ios_version);
+    if (ios_result < 0) {
+        printf("unable to reload IOS version! (error %d)\n", ios_result);
         return false;
     }
 
     // Keep memory protections disabled.
     disable_memory_protections();
 
-    return true;
+    if (AHBPROT_DISABLED) {
+        return true;
+    } else {
+        printf("unable to preserve AHBPROT after IOS reload!\n");
+        return false;
+    }
+}
+
+bool patch_ahbprot_reset() {
+    s32 current_ios = IOS_GetVersion();
+    if (current_ios < 0) {
+        printf("unable to get current IOS version! (error %d)\n", current_ios);
+        return false;
+    }
+
+    return patch_ahbprot_reset_for_ver(current_ios);
 }
 
 bool patch_isfs_permissions() {

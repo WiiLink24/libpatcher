@@ -7,6 +7,7 @@ bool patch_ios_range(const u16 original_patch[], const u16 new_patch[],
                      u32 patch_size);
 
 // Applies specific patches.
+bool patch_ahbprot_reset_for_ver(s32 ios_version);
 bool patch_ahbprot_reset();
 
 // These functions expect AHBPROT has already been disabled via the above.
