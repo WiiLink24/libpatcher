@@ -64,8 +64,21 @@ static const u16 ios_verify_patch[] = {
     0xb000  // nop
 };
 
+// Following patches were made by damysteryman for use with Wii U's vWii.
+static const u16 Kill_AntiSysTitleInstallv3_pt1_old[] = { 0x681A, 0x2A01, 0xD005 };     // Make sure that the pt1
+static const u16 Kill_AntiSysTitleInstallv3_pt1_patch[] = { 0x681A, 0x2A01, 0x46C0 };   // patch is applied twice. -dmm
+
+static const u16 Kill_AntiSysTitleInstallv3_pt2_old[] = { 0xD002, 0x3306, 0x429A, 0xD101 };     // Make sure that the pt2 patch
+static const u16 Kill_AntiSysTitleInstallv3_pt2_patch[] = { 0x46C0, 0x3306, 0x429A, 0xE001 };   // is also applied twice. -dmm
+
+static const u16 Kill_AntiSysTitleInstallv3_pt3_old[] = { 0x68FB, 0x2B00, 0xDB01 };
+static const u16 Kill_AntiSysTitleInstallv3_pt3_patch[] = { 0x68FB, 0x2B00, 0xDB10 };
+
 // If a new IOS patch is added, please update accordingly.
-#define ISFS_PERMISSIONS_SIZE sizeof(isfs_permissions_patch)
-#define ES_IDENTIFY_SIZE sizeof(es_identify_patch)
-#define IOS_VERIFY_SIZE sizeof(ios_verify_patch)
-#define TICKET_CHECK_SIZE sizeof(ticket_check_patch)
+#define ISFS_PERMISSIONS_SIZE       sizeof(isfs_permissions_patch)
+#define ES_IDENTIFY_SIZE            sizeof(es_identify_patch)
+#define IOS_VERIFY_SIZE             sizeof(ios_verify_patch)
+#define TICKET_CHECK_SIZE           sizeof(ticket_check_patch)
+#define KASTIV3_PT1_SIZE            sizeof(Kill_AntiSysTitleInstallv3_pt1_patch)
+#define KASTIV3_PT2_SIZE            sizeof(Kill_AntiSysTitleInstallv3_pt2_patch)
+#define KASTIV3_PT3_SIZE            sizeof(Kill_AntiSysTitleInstallv3_pt3_patch)

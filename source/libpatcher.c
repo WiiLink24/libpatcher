@@ -8,8 +8,10 @@
 
 #define HW_AHBPROT 0x0d800064
 #define MEM2_PROT 0x0d8b420a
+#define WIIU_REG 0x0d8005a0
 
 #define AHBPROT_DISABLED read32(HW_AHBPROT) == 0xFFFFFFFF
+#define IS_WIIU read16(WIIU_REG) == 0xCAFE
 #define IOS_MEMORY_START (u32 *)0x933E0000
 #define IOS_MEMORY_END (u32 *)0x93FFFFFF
 
@@ -130,6 +132,12 @@ bool patch_ios_verify() {
     return patch_ios_range(ios_verify_old, ios_verify_patch, IOS_VERIFY_SIZE);
 }
 
+bool patch_wiiu_systitleinstall() {
+    return patch_ios_range(Kill_AntiSysTitleInstallv3_pt1_old, Kill_AntiSysTitleInstallv3_pt1_patch, KASTIV3_PT1_SIZE) &&
+        patch_ios_range(Kill_AntiSysTitleInstallv3_pt2_old, Kill_AntiSysTitleInstallv3_pt2_patch, KASTIV3_PT2_SIZE) &&
+        patch_ios_range(Kill_AntiSysTitleInstallv3_pt3_old, Kill_AntiSysTitleInstallv3_pt3_patch, KASTIV3_PT3_SIZE);
+}
+
 bool apply_patches() {
     bool ahbprot_fix = patch_ahbprot_reset();
     if (!ahbprot_fix) {
@@ -150,6 +158,13 @@ bool apply_patches() {
     if (!patch_ios_verify()) {
         printf("unable to find and patch IOSC_VerifyPublicKeySign!\n");
         return false;
+    }
+
+    if (IS_WIIU) {
+        if (!patch_wiiu_systitleinstall()) {
+            printf("unable to patch wiiu sys title check!\n");
+            return false;
+        }
     }
 
     return true;
