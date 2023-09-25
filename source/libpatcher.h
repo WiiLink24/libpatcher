@@ -14,6 +14,7 @@ bool patch_ahbprot_reset();
 bool patch_isfs_permissions();
 bool patch_es_identify();
 bool patch_ios_verify();
+bool patch_wiiu_systitleinstall();
 
 // Applies all patches.
 bool apply_patches();
